@@ -1,0 +1,127 @@
+import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Link, useLocation } from 'react-router-dom';
+import { Menu, X } from 'lucide-react';
+import clsx from 'clsx';
+
+export default function Navbar() {
+  const [scrolled, setScrolled] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const location = useLocation();
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 60);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const navLinks = [
+    { name: 'Home', href: '/' },
+    { name: 'How It Works', href: '/#how-it-works' },
+    { name: 'Leaderboard', href: '/#leaderboard' },
+    { name: 'About', href: '/#about' },
+  ];
+
+  return (
+    <>
+      <motion.nav
+        initial={{ y: -100, x: '-50%' }}
+        animate={{ 
+          y: 0, 
+          x: '-50%',
+          scale: scrolled ? 0.96 : 1,
+          boxShadow: scrolled 
+            ? '0 20px 40px -10px rgba(26,92,56,0.15)' 
+            : '0 10px 30px -10px rgba(0,0,0,0.1)'
+        }}
+        transition={{ duration: 0.4, type: 'spring', stiffness: 200, damping: 20 }}
+        className="fixed top-5 left-1/2 z-50 w-[90%] max-w-5xl bg-white/60 backdrop-blur-xl border border-white/40 rounded-full px-6 py-3 flex items-center justify-between"
+      >
+        {/* Logo */}
+        <Link to="/" className="flex items-center gap-2">
+          <div className="w-9 h-9 bg-primary rounded-full flex items-center justify-center shadow-glow">
+            <span className="text-white font-heading italic text-xl leading-none pt-1 pr-0.5">F</span>
+          </div>
+          <span className="font-heading italic text-2xl tracking-tight text-textDark pt-1">FoodBridge</span>
+        </Link>
+
+        {/* Desktop Links */}
+        <div className="hidden md:flex items-center gap-8">
+          {navLinks.map((link) => {
+            const isActive = link.href === '/' 
+              ? location.pathname === '/' && !location.hash 
+              : location.pathname === link.href.split('#')[0] && location.hash === ('#' + link.href.split('#')[1]);
+
+            return (
+              <a 
+                key={link.name} 
+                href={link.href}
+                className="relative text-sm font-medium text-textDark hover:text-primary transition-colors"
+              >
+                {link.name}
+                {isActive && (
+                  <motion.div
+                    layoutId="navDot"
+                    className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-1.5 h-1.5 bg-primary rounded-full"
+                    transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+                  />
+                )}
+              </a>
+            );
+          })}
+        </div>
+
+        {/* Actions */}
+        <div className="hidden md:flex items-center gap-3">
+          <Link to="/login" className="text-sm font-medium text-textDark hover:text-primary transition-colors px-3 py-2">
+            Log In
+          </Link>
+          <Link to="/login" className="bg-primary hover:bg-primary-dark text-white text-sm font-medium px-6 py-2.5 rounded-full shadow-glow transition-all hover:scale-[1.03] active:scale-95">
+            Get Started
+          </Link>
+        </div>
+
+        {/* Mobile Hamburger */}
+        <button 
+          className="md:hidden text-textDark p-2"
+          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+        >
+          {mobileMenuOpen ? <X className="w-6 h-6"/> : <Menu className="w-6 h-6" />}
+        </button>
+      </motion.nav>
+
+      {/* Mobile Menu */}
+      <AnimatePresence>
+        {mobileMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: -20, x: '-50%' }}
+            animate={{ opacity: 1, y: 0, x: '-50%' }}
+            exit={{ opacity: 0, y: -20, x: '-50%' }}
+            className="fixed top-24 left-1/2 w-[90%] max-w-md z-40 bg-surface/90 backdrop-blur-xl border border-white/40 rounded-[24px] shadow-xl overflow-hidden p-6 flex flex-col gap-4 md:hidden"
+          >
+            {navLinks.map((link) => (
+              <a 
+                key={link.name} 
+                href={link.href}
+                className="text-lg font-medium text-textDark py-2 border-b border-border"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                {link.name}
+              </a>
+            ))}
+            <div className="flex flex-col gap-3 mt-4">
+              <Link to="/login" className="text-center font-medium text-primary py-3 border-[1.5px] border-primary rounded-full hover:bg-primary hover:text-white transition-colors">
+                Log In
+              </Link>
+              <Link to="/login" className="text-center font-medium text-white bg-primary py-3 rounded-full shadow-glow">
+                Get Started
+              </Link>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </>
+  );
+}
