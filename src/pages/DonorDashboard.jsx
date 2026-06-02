@@ -11,6 +11,7 @@ import clsx from 'clsx';
 import QRCode from 'react-qr-code';
 import confetti from 'canvas-confetti';
 import UserProfile from '../components/UserProfile';
+import SpotlightTour from '../components/SpotlightTour';
 
 // Simple hook for counting up numbers
 const useCountUp = (end, duration = 1500) => {
@@ -37,6 +38,18 @@ export default function DonorDashboard() {
   
   const [activeTab, setActiveTab] = useState('Overview');
   const [profileOpen, setProfileOpen] = useState(false);
+  const [tourActive, setTourActive] = useState(false);
+
+  useEffect(() => {
+    if (localStorage.getItem('foodbridge_tour_active') === 'true') {
+      setTourActive(true);
+    }
+  }, []);
+
+  const handleCloseTour = () => {
+    setTourActive(false);
+    localStorage.removeItem('foodbridge_tour_active');
+  };
 
   // Sidebar items
   const sidebarItems = [
@@ -76,7 +89,7 @@ export default function DonorDashboard() {
             </div>
           </button>
 
-          <nav className="flex flex-col gap-2 relative">
+          <nav id="tour-sidebar-nav" className="flex flex-col gap-2 relative">
             {sidebarItems.map(item => (
               <button
                 key={item.id}
@@ -139,6 +152,7 @@ export default function DonorDashboard() {
       </div>
 
       <UserProfile isOpen={profileOpen} onClose={() => setProfileOpen(false)} />
+      <SpotlightTour active={tourActive} onClose={handleCloseTour} />
     </div>
   );
 }
@@ -160,7 +174,7 @@ const OverviewTab = ({ user, setActiveTab }) => {
       {/* Bento Grid */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         {/* Card A: Trust Score */}
-        <div className="md:col-span-2 bg-white rounded-card p-6 shadow-sm border border-gray-100 flex items-center justify-between">
+        <div id="tour-trust-score" className="md:col-span-2 bg-white rounded-card p-6 shadow-sm border border-gray-100 flex items-center justify-between">
           <div>
             <h3 className="text-lg font-bold mb-1">Trust Score</h3>
             <p className="text-gray-500 text-sm mb-4">Your community standing is excellent.</p>
@@ -185,25 +199,28 @@ const OverviewTab = ({ user, setActiveTab }) => {
           </div>
         </div>
 
-        {/* Card B, C, D */}
-        <div className="bg-white rounded-card p-6 shadow-sm border border-gray-100 flex flex-col justify-between">
-          <div className="w-10 h-10 rounded-full bg-blue-50 text-blue-500 flex items-center justify-center mb-4"><Package className="w-5 h-5"/></div>
-          <div>
-            <div className="text-sm text-gray-500 font-semibold mb-1">Total Donations</div>
-            <div className="text-3xl font-black tabular-nums">{donations}</div>
+        {/* Card B, C */}
+        <div id="tour-stat-cards" className="col-span-2 grid grid-cols-2 gap-6">
+          <div className="bg-white rounded-card p-6 shadow-sm border border-gray-100 flex flex-col justify-between">
+            <div className="w-10 h-10 rounded-full bg-blue-50 text-blue-500 flex items-center justify-center mb-4"><Package className="w-5 h-5"/></div>
+            <div>
+              <div className="text-sm text-gray-500 font-semibold mb-1">Total Donations</div>
+              <div className="text-3xl font-black tabular-nums">{donations}</div>
+            </div>
           </div>
-        </div>
-        <div className="bg-white rounded-card p-6 shadow-sm border border-gray-100 flex flex-col justify-between">
-          <div className="w-10 h-10 rounded-full bg-purple-50 text-purple-500 flex items-center justify-center mb-4"><Ticket className="w-5 h-5"/></div>
-          <div>
-            <div className="text-sm text-gray-500 font-semibold mb-1">Vouchers Earned</div>
-            <div className="text-3xl font-black tabular-nums">{vouchers}</div>
+          <div className="bg-white rounded-card p-6 shadow-sm border border-gray-100 flex flex-col justify-between">
+            <div className="w-10 h-10 rounded-full bg-purple-50 text-purple-500 flex items-center justify-center mb-4"><Ticket className="w-5 h-5"/></div>
+            <div>
+              <div className="text-sm text-gray-500 font-semibold mb-1">Vouchers Earned</div>
+              <div className="text-3xl font-black tabular-nums">{vouchers}</div>
+            </div>
           </div>
         </div>
       </div>
 
       {/* CTA Button */}
       <motion.button
+        id="tour-main-cta"
         onClick={() => setActiveTab('Donate Food')}
         className="w-full relative group bg-primary hover:bg-primary-dark text-white font-bold text-lg py-5 rounded-btn overflow-hidden transition-colors"
       >

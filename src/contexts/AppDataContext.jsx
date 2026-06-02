@@ -11,6 +11,7 @@ export const AppDataProvider = ({ children }) => {
   const [reviews, setReviews] = useState(initialReviews);
   const [donors, setDonors] = useState(initialDonors);
   const [receivers, setReceivers] = useState(initialReceivers);
+  const [users, setUsers] = useState([]);
   const [banThreshold, setBanThreshold] = useState(30);
 
   const addFoodListing = (newFood) => {
@@ -62,7 +63,8 @@ export const AppDataProvider = ({ children }) => {
       donors, setDonors,
       receivers, setReceivers, updateReceiverAllergy,
       banThreshold, updateBanThreshold,
-      updateBookingStatus
+      updateBookingStatus,
+      users, setUsers
     }}>
       {children}
     </AppDataContext.Provider>

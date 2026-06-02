@@ -296,6 +296,27 @@ export default function Hero3DScene() {
       const initialX = -3.5 + (i * beltLength / itemCount);
       itemGroup.position.set(initialX, 0.45 + beltHeight, 0);
       
+      if (initialX >= -0.15) {
+        rawMesh.visible = false;
+        boxMesh.visible = true;
+      } else {
+        rawMesh.visible = true;
+        boxMesh.visible = false;
+      }
+
+      // Initialize proper scale based on position
+      const rightThreshold = beltLength / 2 - 0.5;
+      const leftThreshold = -beltLength / 2 + 0.5;
+      if (initialX < leftThreshold) {
+        const scale = Math.min(1, Math.max(0, (initialX - (-beltLength / 2 - 0.2)) / 0.7));
+        itemGroup.scale.set(scale, scale, scale);
+      } else if (initialX > rightThreshold) {
+        const scale = Math.max(0, 1 - (initialX - rightThreshold) / 0.7);
+        itemGroup.scale.set(scale, scale, scale);
+      } else {
+        itemGroup.scale.set(1, 1, 1);
+      }
+      
       conveyorAssembly.add(itemGroup);
       
       items.push({
@@ -368,7 +389,7 @@ export default function Hero3DScene() {
           item.rawMesh.visible = true;
           item.boxMesh.visible = false;
           item.group.rotation.set(0, 0, 0);
-          item.group.scale.set(1, 1, 1);
+          item.group.scale.set(0, 0, 0);
 
           // Cycle through next raw food type
           item.group.remove(item.rawMesh);
@@ -403,21 +424,24 @@ export default function Hero3DScene() {
             item.group.scale.set(1.3, 1.3, 1.3);
           }
           
-          // Smoothly decay hop scale back to normal
-          item.group.scale.x = THREE.MathUtils.lerp(item.group.scale.x, 1, 10 * dt);
-          item.group.scale.y = THREE.MathUtils.lerp(item.group.scale.y, 1, 10 * dt);
-          item.group.scale.z = THREE.MathUtils.lerp(item.group.scale.z, 1, 10 * dt);
-
           // Slightly rotate box to look dynamic
           item.boxMesh.rotation.y = time * 0.5;
         }
 
-        // Fade scale out at the very end of belt
+        // Smooth scale handling based on position
         const rightThreshold = beltLength / 2 - 0.5;
-        if (item.group.position.x > rightThreshold) {
-          const fadeProgress = (item.group.position.x - rightThreshold) / 0.7;
-          const scale = Math.max(0, 1 - fadeProgress);
+        const leftThreshold = -beltLength / 2 + 0.5;
+        if (item.group.position.x < leftThreshold) {
+          const scale = Math.min(1, Math.max(0, (item.group.position.x - (-beltLength / 2 - 0.2)) / 0.7));
           item.group.scale.set(scale, scale, scale);
+        } else if (item.group.position.x > rightThreshold) {
+          const scale = Math.max(0, 1 - (item.group.position.x - rightThreshold) / 0.7);
+          item.group.scale.set(scale, scale, scale);
+        } else {
+          // Smoothly decay hop scale back to normal
+          item.group.scale.x = THREE.MathUtils.lerp(item.group.scale.x, 1, 10 * dt);
+          item.group.scale.y = THREE.MathUtils.lerp(item.group.scale.y, 1, 10 * dt);
+          item.group.scale.z = THREE.MathUtils.lerp(item.group.scale.z, 1, 10 * dt);
         }
       });
 

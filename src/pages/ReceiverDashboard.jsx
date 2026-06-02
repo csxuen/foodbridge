@@ -14,6 +14,7 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import confetti from 'canvas-confetti';
 import UserProfile from '../components/UserProfile';
+import SpotlightTour from '../components/SpotlightTour';
 
 // Leaflet icon fix
 delete L.Icon.Default.prototype._getIconUrl;
@@ -57,6 +58,18 @@ export default function ReceiverDashboard() {
   const { showToast } = useToast();
   const [activeTab, setActiveTab] = useState('Overview');
   const [profileOpen, setProfileOpen] = useState(false);
+  const [tourActive, setTourActive] = useState(false);
+
+  useEffect(() => {
+    if (localStorage.getItem('foodbridge_tour_active') === 'true') {
+      setTourActive(true);
+    }
+  }, []);
+
+  const handleCloseTour = () => {
+    setTourActive(false);
+    localStorage.removeItem('foodbridge_tour_active');
+  };
 
   const sidebarItems = [
     { id: 'Overview', icon: LayoutDashboard },
@@ -68,7 +81,7 @@ export default function ReceiverDashboard() {
 
   const renderContent = () => {
     switch (activeTab) {
-      case 'Overview': return <OverviewTab user={user} updateReceiverAllergy={updateReceiverAllergy} bookings={bookings} showToast={showToast} />;
+      case 'Overview': return <OverviewTab user={user} updateReceiverAllergy={updateReceiverAllergy} bookings={bookings} showToast={showToast} setActiveTab={setActiveTab} />;
       case 'Browse Food': return <BrowseFoodTab user={user} foodListings={foodListings} addBooking={addBooking} donors={donors} showToast={showToast} />;
       case 'My Bookings': return <MyBookingsTab user={user} bookings={bookings} cancelBooking={cancelBooking} addReview={addReview} foodListings={foodListings} donors={donors} showToast={showToast} updateBookingStatus={updateBookingStatus} />;
       case 'Trust Score': return <TrustScoreTab user={user} />;
@@ -91,7 +104,7 @@ export default function ReceiverDashboard() {
               <div className="text-xs bg-primary-tint text-primary-dark px-2 py-0.5 rounded-full inline-block font-semibold">Receiver</div>
             </div>
           </button>
-          <nav className="flex flex-col gap-2 relative">
+          <nav id="tour-sidebar-nav" className="flex flex-col gap-2 relative">
             {sidebarItems.map(item => (
               <button
                 key={item.id}
@@ -123,6 +136,7 @@ export default function ReceiverDashboard() {
       </div>
 
       <UserProfile isOpen={profileOpen} onClose={() => setProfileOpen(false)} />
+      <SpotlightTour active={tourActive} onClose={handleCloseTour} />
     </div>
   );
 }
@@ -131,7 +145,7 @@ export default function ReceiverDashboard() {
 // TAB COMPONENTS
 // -------------------------------------------------------------
 
-const OverviewTab = ({ user, updateReceiverAllergy, bookings, showToast }) => {
+const OverviewTab = ({ user, updateReceiverAllergy, bookings, showToast, setActiveTab }) => {
   const { updateCurrentUser } = useAuth();
   const pickups = useCountUp(user?.completedPickups || 0);
   const score = useCountUp(user?.trustScore || 0);
@@ -155,13 +169,10 @@ const OverviewTab = ({ user, updateReceiverAllergy, bookings, showToast }) => {
     <div className="space-y-8">
       <h1 className="text-3xl font-heading font-black">Receiver Overview</h1>
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <div className="bg-white rounded-card p-6 shadow-sm border border-gray-100 flex flex-col justify-between">
-          <div className="w-10 h-10 rounded-full bg-blue-50 text-blue-500 flex items-center justify-center mb-4"><Check className="w-5 h-5"/></div>
-          <div><div className="text-sm text-gray-500 font-semibold mb-1">Pickups Completed</div><div className="text-3xl font-black tabular-nums">{pickups}</div></div>
-        </div>
-        <div className="md:col-span-2 bg-white rounded-card p-6 shadow-sm border border-gray-100 flex items-center justify-between">
+        {/* Card A: Trust Score */}
+        <div id="tour-trust-score" className="md:col-span-2 bg-white rounded-card p-6 shadow-sm border border-gray-100 flex items-center justify-between">
           <div><h3 className="text-lg font-bold mb-1">Trust Score</h3><p className="text-gray-500 text-sm mb-4">Higher scores unlock priority bookings.</p><div className="text-4xl font-black tabular-nums">{score}/100</div></div>
-          <div className="relative w-24 h-24">
+          <div className="relative w-24 h-24 flex-shrink-0">
             <svg className="w-24 h-24 transform -rotate-90">
               <circle cx="48" cy="48" r="40" stroke="currentColor" strokeWidth="8" fill="transparent" className="text-gray-100" />
               <motion.circle cx="48" cy="48" r="40" stroke="currentColor" strokeWidth="8" fill="transparent" strokeDasharray={40 * 2 * Math.PI} 
@@ -172,11 +183,33 @@ const OverviewTab = ({ user, updateReceiverAllergy, bookings, showToast }) => {
             </div>
           </div>
         </div>
-        <div className="bg-white rounded-card p-6 shadow-sm border border-gray-100 flex flex-col justify-between">
-          <div className="w-10 h-10 rounded-full bg-amber-50 text-amber-500 flex items-center justify-center mb-4"><CalendarCheck className="w-5 h-5"/></div>
-          <div><div className="text-sm text-gray-500 font-semibold mb-1">Active Bookings</div><div className="text-3xl font-black tabular-nums">{activeBookings}</div></div>
+
+        {/* Card B, C: Stats */}
+        <div id="tour-stat-cards" className="col-span-2 grid grid-cols-2 gap-6">
+          <div className="bg-white rounded-card p-6 shadow-sm border border-gray-100 flex flex-col justify-between">
+            <div className="w-10 h-10 rounded-full bg-blue-50 text-blue-500 flex items-center justify-center mb-4"><Check className="w-5 h-5"/></div>
+            <div><div className="text-sm text-gray-500 font-semibold mb-1">Pickups Completed</div><div className="text-3xl font-black tabular-nums">{pickups}</div></div>
+          </div>
+          <div className="bg-white rounded-card p-6 shadow-sm border border-gray-100 flex flex-col justify-between">
+            <div className="w-10 h-10 rounded-full bg-amber-50 text-amber-500 flex items-center justify-center mb-4"><CalendarCheck className="w-5 h-5"/></div>
+            <div><div className="text-sm text-gray-500 font-semibold mb-1">Active Bookings</div><div className="text-3xl font-black tabular-nums">{activeBookings}</div></div>
+          </div>
         </div>
       </div>
+
+      {/* CTA Button */}
+      <motion.button
+        id="tour-main-cta"
+        onClick={() => setActiveTab('Browse Food')}
+        className="w-full relative group bg-primary hover:bg-primary-dark text-white font-bold text-lg py-5 rounded-btn overflow-hidden transition-colors"
+      >
+        <span className="relative z-10 flex items-center justify-center gap-2"><Search className="w-5 h-5" /> Find Food Nearby</span>
+        <motion.div
+          animate={{ scale: [1, 1.05, 1], opacity: [0.5, 0.8, 0.5] }}
+          transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute inset-0 bg-white/20 z-0"
+        />
+      </motion.button>
       <div className="bg-white rounded-card p-6 shadow-sm border border-gray-100">
         <h3 className="text-lg font-bold mb-2">My Dietary Restrictions</h3>
         <p className="text-gray-500 text-sm mb-4">Set your allergies to automatically warn you about unsafe food listings.</p>

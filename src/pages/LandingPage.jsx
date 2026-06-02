@@ -167,16 +167,16 @@ export default function LandingPage() {
               className="flex flex-col sm:flex-row gap-4 mb-12"
             >
               <Link
-                to="/login"
+                to="/register"
                 className="flex items-center justify-center gap-2 bg-primary hover:bg-primary-dark text-white px-8 py-4 rounded-full font-bold text-lg shadow-glow transition-all hover:scale-105 active:scale-95"
               >
-                Start Donating <ArrowRight className="w-5 h-5" />
+                Get Started <ArrowRight className="w-5 h-5" />
               </Link>
               <Link
                 to="/login"
                 className="flex items-center justify-center gap-2 bg-white border-2 border-gray-200 hover:border-primary/50 text-gray-700 hover:text-primary px-8 py-4 rounded-full font-bold text-lg transition-colors"
               >
-                <MapPin className="w-5 h-5" /> Find Food Near Me
+                <MapPin className="w-5 h-5" /> Sign In
               </Link>
             </motion.div>
 
@@ -320,7 +320,7 @@ export default function LandingPage() {
               <p className="text-textMuted">Celebrating our most impactful community members.</p>
             </div>
             <Link to="/login" className="text-primary font-bold hover:text-primary-dark flex items-center gap-1">
-              View Full Leaderboard <ArrowRight className="w-4 h-4" />
+              Sign in to view <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
 
@@ -400,7 +400,7 @@ export default function LandingPage() {
               <h3 className="text-2xl font-bold text-primary-dark mb-2">Be part of the change.</h3>
               <p className="text-gray-700 max-w-xl">Every meal shared is a step towards a zero-waste community. Join thousands of Malaysians making a difference today.</p>
             </div>
-            <Link to="/login" className="whitespace-nowrap bg-primary hover:bg-primary-dark text-white font-bold py-4 px-8 rounded-btn shadow-glow transition-transform hover:scale-105">
+            <Link to="/register" className="whitespace-nowrap bg-primary hover:bg-primary-dark text-white font-bold py-4 px-8 rounded-btn shadow-glow transition-transform hover:scale-105">
               Start Your Journey
             </Link>
           </motion.div>
