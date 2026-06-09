@@ -10,18 +10,21 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@gsap/react": "^2.1.2",
     "canvas-confetti": "^1.9.2",
-    "clsx": "^2.1.0",
-    "framer-motion": "^11.0.8",
+    "clsx": "^2.1.1",
+    "framer-motion": "^11.18.2",
+    "gsap": "^3.15.0",
     "leaflet": "^1.9.4",
     "lucide-react": "^0.358.0",
+    "puppeteer": "^25.1.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-leaflet": "^4.2.1",
     "react-qr-code": "^2.0.12",
     "react-router-dom": "^6.22.3",
     "recharts": "^2.12.3",
-    "tailwind-merge": "^2.2.1",
+    "tailwind-merge": "^2.6.1",
     "three": "^0.184.0"
   },
   "devDependencies": {

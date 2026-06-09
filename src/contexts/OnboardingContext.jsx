@@ -38,7 +38,7 @@ export const OnboardingProvider = ({ children }) => {
     const onboarded = localStorage.getItem('foodbridge_onboarded') === 'true';
     if (onboarded) {
       setIsNewUser(false);
-      setCurrentStep(5);
+      setCurrentStep(1);
     } else {
       setIsNewUser(true);
       setCurrentStep(1);
@@ -50,13 +50,13 @@ export const OnboardingProvider = ({ children }) => {
     setRoleState(null);
     const onboarded = localStorage.getItem('foodbridge_onboarded') === 'true';
     setIsNewUser(!onboarded);
-    setCurrentStep(onboarded ? 5 : 1);
+    setCurrentStep(1);
     setDirection('forward');
   };
 
   const nextStep = () => {
     setDirection('forward');
-    setCurrentStep(prev => Math.min(prev + 1, 6));
+    setCurrentStep(prev => Math.min(prev + 1, 5));
   };
 
   const prevStep = () => {

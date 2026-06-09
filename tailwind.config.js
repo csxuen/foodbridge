@@ -7,28 +7,22 @@ export default {
   theme: {
     extend: {
       colors: {
-        background: 'var(--color-canvas)',
-        surface: 'var(--color-surface)',
-        primary: {
-          DEFAULT: 'var(--color-primary)',
-          dark: 'var(--color-primary-dark)',
-          tint: 'var(--color-primary-tint)',
-        },
-        warm: 'var(--color-warm-contrast)',
-        textDark: 'var(--color-text)',
-        textMuted: 'var(--color-text-muted)',
-        border: 'rgba(26, 92, 56, 0.08)',
+        forest: '#1C2B1E',
+        lime: '#C8F04A',
+        parchment: '#F5F2EC',
+        terracotta: '#E8431A',
       },
       fontFamily: {
-        heading: ['"Instrument Serif"', 'Lora', 'Georgia', 'serif'],
-        body: ['"DM Sans"', 'Inter', 'sans-serif'],
+        display: ['"DM Serif Display"', 'serif'],
+        sans: ['"DM Sans"', 'sans-serif'],
+        syne: ['Syne', 'sans-serif'],
       },
       borderRadius: {
         'card': '20px',
         'btn': '9999px',
       },
       boxShadow: {
-        'glow': '0 12px 40px rgba(26, 92, 56, 0.12)',
+        'glow': '0 12px 40px rgba(28, 43, 30, 0.12)',
       }
     },
   },

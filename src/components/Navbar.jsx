@@ -3,11 +3,13 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Link, useLocation } from 'react-router-dom';
 import { Menu, X } from 'lucide-react';
 import clsx from 'clsx';
+import { useAuth } from '../contexts/AuthContext';
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
+  const { user, role, logout } = useAuth();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -20,8 +22,7 @@ export default function Navbar() {
   const navLinks = [
     { name: 'Home', href: '/' },
     { name: 'How It Works', href: '/#how-it-works' },
-    { name: 'Leaderboard', href: '/#leaderboard' },
-    { name: 'About', href: '/#about' },
+    { name: 'Community Impact', href: '/#community-impact' },
   ];
 
   return (
@@ -41,10 +42,10 @@ export default function Navbar() {
       >
         {/* Logo */}
         <Link to="/" className="flex items-center gap-2">
-          <div className="w-9 h-9 bg-primary rounded-full flex items-center justify-center shadow-glow">
-            <span className="text-white font-heading italic text-xl leading-none pt-1 pr-0.5">F</span>
+          <div className="w-9 h-9 bg-forest rounded-full flex items-center justify-center shadow-glow">
+            <span className="text-parchment font-heading italic text-xl leading-none pt-1 pr-0.5">F</span>
           </div>
-          <span className="font-heading italic text-2xl tracking-tight text-textDark pt-1">FoodBridge</span>
+          <span className="font-heading italic text-2xl tracking-tight text-forest pt-1">FoodBridge</span>
         </Link>
 
         {/* Desktop Links */}
@@ -58,13 +59,28 @@ export default function Navbar() {
               <a 
                 key={link.name} 
                 href={link.href}
-                className="relative text-sm font-medium text-textDark hover:text-primary transition-colors"
+                onClick={(e) => {
+                  if (link.href.startsWith('/#') && location.pathname === '/') {
+                    const id = link.href.substring(2);
+                    const el = document.getElementById(id);
+                    if (el) {
+                      e.preventDefault();
+                      el.scrollIntoView({ behavior: 'smooth' });
+                      window.history.pushState(null, '', link.href);
+                    }
+                  } else if (link.href === '/' && location.pathname === '/') {
+                    e.preventDefault();
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                    window.history.pushState(null, '', '/');
+                  }
+                }}
+                className="relative text-sm font-medium text-forest hover:opacity-70 transition-opacity"
               >
                 {link.name}
                 {isActive && (
                   <motion.div
                     layoutId="navDot"
-                    className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-1.5 h-1.5 bg-primary rounded-full"
+                    className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-1.5 h-1.5 bg-forest rounded-full"
                     transition={{ type: 'spring', stiffness: 300, damping: 30 }}
                   />
                 )}
@@ -75,17 +91,30 @@ export default function Navbar() {
 
         {/* Actions */}
         <div className="hidden md:flex items-center gap-3">
-          <Link to="/login" className="text-sm font-medium text-textDark hover:text-primary transition-colors px-3 py-2">
-            Log In
-          </Link>
-          <Link to="/login" className="bg-primary hover:bg-primary-dark text-white text-sm font-medium px-6 py-2.5 rounded-full shadow-glow transition-all hover:scale-[1.03] active:scale-95">
-            Get Started
-          </Link>
+          {user ? (
+            <>
+              <Link to={role === 'donor' ? '/donor' : role === 'receiver' ? '/receiver' : '/admin'} className="bg-forest hover:bg-[#111913] text-parchment text-sm font-medium px-6 py-2.5 rounded-full shadow-glow transition-all hover:scale-[1.03] active:scale-95">
+                Dashboard
+              </Link>
+              <button onClick={logout} className="text-sm font-medium text-forest hover:text-red-600 transition-colors px-3 py-2">
+                Log Out
+              </button>
+            </>
+          ) : (
+            <>
+              <Link to="/login" className="text-sm font-medium text-forest hover:opacity-70 transition-opacity px-3 py-2">
+                Log In
+              </Link>
+              <Link to="/register" className="bg-forest hover:bg-[#111913] text-parchment text-sm font-medium px-6 py-2.5 rounded-full shadow-glow transition-all hover:scale-[1.03] active:scale-95">
+                Get Started
+              </Link>
+            </>
+          )}
         </div>
 
         {/* Mobile Hamburger */}
         <button 
-          className="md:hidden text-textDark p-2"
+          className="md:hidden text-forest p-2"
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
         >
           {mobileMenuOpen ? <X className="w-6 h-6"/> : <Menu className="w-6 h-6" />}
@@ -105,19 +134,32 @@ export default function Navbar() {
               <a 
                 key={link.name} 
                 href={link.href}
-                className="text-lg font-medium text-textDark py-2 border-b border-border"
+                className="text-lg font-medium text-forest py-2 border-b border-gray-200"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 {link.name}
               </a>
             ))}
             <div className="flex flex-col gap-3 mt-4">
-              <Link to="/login" className="text-center font-medium text-primary py-3 border-[1.5px] border-primary rounded-full hover:bg-primary hover:text-white transition-colors">
-                Log In
-              </Link>
-              <Link to="/login" className="text-center font-medium text-white bg-primary py-3 rounded-full shadow-glow">
-                Get Started
-              </Link>
+              {user ? (
+                <>
+                  <Link to={role === 'donor' ? '/donor' : role === 'receiver' ? '/receiver' : '/admin'} className="text-center font-medium text-parchment bg-forest py-3 rounded-full shadow-glow" onClick={() => setMobileMenuOpen(false)}>
+                    Dashboard
+                  </Link>
+                  <button onClick={() => { logout(); setMobileMenuOpen(false); }} className="text-center font-medium text-red-600 py-3 border-[1.5px] border-red-600 rounded-full hover:bg-red-50 transition-colors">
+                    Log Out
+                  </button>
+                </>
+              ) : (
+                <>
+                  <Link to="/login" className="text-center font-medium text-forest py-3 border-[1.5px] border-forest rounded-full hover:bg-forest hover:text-parchment transition-colors" onClick={() => setMobileMenuOpen(false)}>
+                    Log In
+                  </Link>
+                  <Link to="/register" className="text-center font-medium text-parchment bg-forest py-3 rounded-full shadow-glow" onClick={() => setMobileMenuOpen(false)}>
+                    Get Started
+                  </Link>
+                </>
+              )}
             </div>
           </motion.div>
         )}

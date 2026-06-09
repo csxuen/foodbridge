@@ -1,4 +1,6 @@
-import React, { useState, useEffect } from 'react';
+const fs = require('fs');
+
+const code = `import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../contexts/AuthContext';
@@ -178,7 +180,7 @@ export default function ReceiverDashboard() {
               >
                 {item}
               </button>
-            ))}
+            )}
             <button onClick={() => { setActiveTab('Notifications'); setMobileMenuOpen(false); }} className={clsx("p-4 text-left font-bold rounded-2xl transition-colors flex justify-between", activeTab === 'Notifications' ? "bg-lime/30 text-forest" : "text-forest/70 hover:bg-forest/5")}>
               Notifications <span className="w-2 h-2 bg-rose-400 rounded-full"></span>
             </button>
@@ -191,12 +193,14 @@ export default function ReceiverDashboard() {
 
       {/* SCROLLABLE CONTENT VIEW */}
       <main className="flex-1 overflow-y-auto hide-scrollbar relative z-10 p-6 md:p-10">
+        <AnimatePresence mode="wait">
           {activeTab === 'Overview' && <OverviewTab key="Overview" user={user} updateReceiverAllergy={updateReceiverAllergy} bookings={bookings} showToast={showToast} setActiveTab={setActiveTab} />}
           {activeTab === 'Browse Food' && <BrowseFoodTab key="BrowseFood" user={user} foodListings={foodListings} addBooking={addBooking} donors={donors} showToast={showToast} />}
           {activeTab === 'My Bookings' && <MyBookingsTab key="MyBookings" user={user} bookings={bookings} cancelBooking={cancelBooking} addReview={addReview} foodListings={foodListings} donors={donors} showToast={showToast} updateBookingStatus={updateBookingStatus} />}
           {activeTab === 'Trust Score' && <TrustScoreTab key="TrustScore" user={user} />}
           {activeTab === 'History' && <HistoryTab key="History" user={user} bookings={bookings} foodListings={foodListings} donors={donors} />}
           {activeTab === 'Notifications' && <div key="Notifications" className="max-w-2xl mx-auto"><h2 className="text-3xl font-heading font-black mb-8 text-forest">Notifications</h2><div className="bg-white rounded-[2rem] p-8 text-center text-forest/60 border border-forest/5 shadow-xl shadow-forest/5">No new notifications.</div></div>}
+        </AnimatePresence>
       </main>
 
       <UserProfile isOpen={profileOpen} onClose={() => setProfileOpen(false)} />
@@ -342,7 +346,7 @@ const BrowseFoodTab = ({ user, foodListings, addBooking, donors, showToast }) =>
       donorId: selectedFood.donorId,
       status: 'Upcoming',
       pickupSlot: slot,
-      qrValue: `FB-${Date.now()}-${user.id}`,
+      qrValue: \`FB-\${Date.now()}-\${user.id}\`,
       reviewSubmitted: false
     });
     confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 }, colors: ['#bdf259', '#1c2b1e'] });
@@ -474,7 +478,7 @@ const FoodCard = ({ food, donors, user, onBook }) => {
     } else {
       const h = Math.floor(diff / (1000 * 60 * 60));
       const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-      setTimeLeft(`${h}h ${m}m left`);
+      setTimeLeft(\`\${h}h \${m}m left\`);
       setIsUrgent(h < 2);
     }
   }, 1000);
@@ -531,7 +535,7 @@ const MyBookingsTab = ({ user, bookings, cancelBooking, addReview, foodListings,
 
   useEffect(() => {
     if (directionsModal) {
-      fetch(`https://router.project-osrm.org/route/v1/walking/${101.6750},${3.1250};${directionsModal[1]},${directionsModal[0]}?overview=full&geometries=geojson`)
+      fetch(\`https://router.project-osrm.org/route/v1/walking/\${101.6750},\${3.1250};\${directionsModal[1]},\${directionsModal[0]}?overview=full&geometries=geojson\`)
         .then(res => res.json())
         .then(data => {
           if (data.routes && data.routes[0]) {
@@ -725,7 +729,7 @@ const TrustScoreTab = ({ user }) => {
           <div key={i} className="bg-white p-6 rounded-[2rem] border border-forest/10 shadow-xl shadow-forest/5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 sm:gap-8">
             <span className="font-black text-forest sm:w-56 shrink-0">{bar.label}</span>
             <div className="flex-1 h-4 bg-forest/5 rounded-full overflow-hidden shadow-inner">
-              <motion.div initial={{ width: 0 }} animate={{ width: `${bar.value}%` }} transition={{ duration: 1, delay: i * 0.2 }} className={clsx("h-full rounded-full", bar.color)} />
+              <motion.div initial={{ width: 0 }} animate={{ width: \`\${bar.value}%\` }} transition={{ duration: 1, delay: i * 0.2 }} className={clsx("h-full rounded-full", bar.color)} />
             </div>
             <span className="font-black text-xl tabular-nums w-16 text-right text-forest">{bar.value}%</span>
           </div>
@@ -773,3 +777,6 @@ const HistoryTab = ({ user, bookings, foodListings, donors }) => {
     </motion.div>
   );
 };
+`;
+
+fs.writeFileSync('d:/SEM5/foodbridge prototype/foodbridge/src/pages/ReceiverDashboard.jsx', code);

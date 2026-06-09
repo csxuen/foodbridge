@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { donors, receivers, adminUsers } from '../data/mockData';
 
 const AuthContext = createContext();
@@ -6,6 +7,7 @@ const AuthContext = createContext();
 export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider = ({ children }) => {
+  const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [role, setRole] = useState(null); // 'donor', 'receiver', 'admin'
   const [customUsers, setCustomUsers] = useState(() => {
@@ -32,10 +34,8 @@ export const AuthProvider = ({ children }) => {
     if (typeof emailOrUser === 'object' && emailOrUser !== null) {
       // Direct login from onboarding wizard
       const u = emailOrUser;
-      // Map to proper mock structure if needed or just use the user object
       const formattedRole = u.role.toLowerCase();
       
-      // Let's check if the user is already in our list of customUsers
       const matched = customUsers.find(item => item.email === u.email && item.role.toLowerCase() === formattedRole);
       foundUser = matched || u;
       setRole(formattedRole);
@@ -74,6 +74,7 @@ export const AuthProvider = ({ children }) => {
   const logout = () => {
     setUser(null);
     setRole(null);
+    navigate('/');
   };
 
   const updateCurrentUser = (updates) => {

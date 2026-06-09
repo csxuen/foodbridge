@@ -5,7 +5,7 @@ import clsx from 'clsx';
 import { useAuth } from '../contexts/AuthContext';
 
 export default function UserProfile({ isOpen, onClose }) {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
 
   if (!user) return null;
 
@@ -96,9 +96,12 @@ export default function UserProfile({ isOpen, onClose }) {
               </div>
             </div>
             
-            <div className="p-6 border-t border-gray-100 bg-gray-50 mt-auto">
-              <button onClick={() => { onClose(); /* Optional: logout action could go here */ }} className="w-full py-3 bg-white border border-gray-200 text-gray-700 font-bold rounded-lg hover:bg-gray-100 transition-colors">
-                Close Profile
+            <div className="p-6 border-t border-gray-100 bg-gray-50 mt-auto flex gap-3">
+              <button onClick={onClose} className="flex-1 py-3 bg-white border border-gray-200 text-gray-700 font-bold rounded-lg hover:bg-gray-100 transition-colors">
+                Close
+              </button>
+              <button onClick={() => { onClose(); logout(); }} className="flex-1 py-3 bg-red-50 border border-red-100 text-red-600 font-bold rounded-lg hover:bg-red-100 transition-colors">
+                Log Out
               </button>
             </div>
           </motion.div>
